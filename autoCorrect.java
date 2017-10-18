@@ -8,10 +8,8 @@ class autoCorrect {
      and the count of the number of occurances of that word as the value.
      (HINT: the code `text.toLowerCase().match(/[a-z]+/g)` will return an array
      of all lowercase words in the string.)
-     
-     Optional method, you can consider utilizing this method but it is not included in this project.
     */
-    public static HashMap<Character, Integer> getWordsCounts(String text) {
+    /*public static HashMap<Character, Integer> getWordsCounts(String text) {
         HashMap<Character, Integer> result = new HashMap<Character, Integer>();
         char[] formattedWord = text.toLowerCase().toCharArray();
 
@@ -25,7 +23,7 @@ class autoCorrect {
         }
 
         return result;
-    }
+    }*/
 
     /*
      Returns the set of all strings 1 edit distance away from the input word.
@@ -83,64 +81,68 @@ class autoCorrect {
       "editDistance1" *again* to each word of its own output do?)
     - Finally, if no good replacements are found, return the word.
     */
-    public static String correctWord (String word) {
-
-        word = word.toLowerCase();
-        ArrayList<String> COMMANDS_POOL = new ArrayList<String>();
-        COMMANDS_POOL.add("find");
-        COMMANDS_POOL.add("add");
-        COMMANDS_POOL.add("search");
-        COMMANDS_POOL.add("delete");
-        ArrayList<String> ADD_WORDS = editDistance1("someRandomTestText");
-
-        if( COMMANDS_POOL.contains(word)) {
-           return word;
+    public static String correctWord (String toBeChecked) {
+        
+        toBeChecked = toBeChecked.toLowerCase();
+        ArrayList<String> commandPool = getCommandPool();
+        final String defaultresult = "No Such Command";
+        String result = "";
+        
+        if (commandPool.contains(toBeChecked)) {
+                return toBeChecked;
         }
-
-        ArrayList<String> editDistance1Words_add = editDistance1("add");
-        ArrayList<ArrayList<String>> editDistance2Words_add = new ArrayList<ArrayList<String>>();
-        for (String editDistance1Word_add : editDistance1Words_add) {
-            editDistance2Words_add.add(editDistance1(editDistance1Word_add));
+        
+        for (String command : commandPool) {
+            if(command.charAt(0) != toBeChecked.charAt(0)) continue;
+            result = checkMisspeltWords(command, toBeChecked);
+            if (!result.equals(defaultresult)) {
+                return result;
+            }
         }
+        
+        return result;
+    }
 
-        if(editDistance1Words_add.contains(word)) {
-            return "add";
-        }
-
-        for(ArrayList<String> editDistance2Word_add : editDistance2Words_add) {
-            if(editDistance2Word_add.contains(word)) return "add";
-        }
-
-        ArrayList<String> editDistance1Words_delete = editDistance1("delete");
-        ArrayList<ArrayList<String>> editDistance2Words_delete = new ArrayList<ArrayList<String>>();
-        for (String editDistance1Word_delete : editDistance1Words_delete) {
-            editDistance2Words_delete.add(editDistance1(editDistance1Word_delete));
-        }
-
-        if(editDistance1Words_delete.contains(word)) {
-            return "delete";
-        }
-
-        for(ArrayList<String> editDistance2Word_delete : editDistance2Words_delete) {
-            if(editDistance2Word_delete.contains(word)) return "delete";
-        }
-
-        ArrayList<String> editDistance1Words_search = editDistance1("search");
+    public static String checkMisspeltWords (String command, String input) {
+        //System.out.println(command);
+        //System.out.println(input);
+        ArrayList<String> editDistance1Words_search = editDistance1(command);
         ArrayList<ArrayList<String>> editDistance2Words_search = new ArrayList<ArrayList<String>>();
         for (String editDistance1Word_search : editDistance1Words_search) {
             editDistance2Words_search.add(editDistance1(editDistance1Word_search));
         }
 
-        if(editDistance1Words_search.contains(word)) {
-            return "search";
+        if(editDistance1Words_search.contains(input)) {
+            return command;
         }
         
         for(ArrayList<String> editDistance2Word_search : editDistance2Words_search) {
-            if(editDistance2Word_search.contains(word)) return "search";
+            if(editDistance2Word_search.contains(input)) return command;
         }
+
+        return "No Such Command";
+    }
+
+    public static ArrayList<String> getCommandPool () {
         
+            ArrayList<String> commandPool = new ArrayList<String>();
+            commandPool.add("find");
+            commandPool.add("add");
+            commandPool.add("search");
+            commandPool.add("delete");
+            commandPool.add("deleteTag");
+            commandPool.add("clear");
+            commandPool.add("edit");
+            commandPool.add("exit");
+            commandPool.add("help");
+            commandPool.add("history");
+            commandPool.add("list");
+            commandPool.add("multifilter");
+            commandPool.add("redo");
+            commandPool.add("select");
+            commandPool.add("undo");
         
-        return "no such command";
+            return commandPool;
     }
 
     public static void main (String[] args) {
@@ -154,7 +156,7 @@ class autoCorrect {
         ArrayList<String> WORDS_POOL = editDistance1("someRandomTestText");
         WORDS_POOL.stream().forEach(e -> System.out.println(e));*/
 
-        System.out.println(correctWord("sercah"));
+        System.out.println(correctWord("sreach"));
 
     }
 }
